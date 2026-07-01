@@ -596,7 +596,7 @@
 .day-card__missas {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 1.1rem;
   padding: 1rem;
 }
 
@@ -604,31 +604,59 @@
   padding-top: 1rem;
 }
 
-/* Missa — blocos claros */
+/* Missa — badge de horário + cards levemente destacados */
 .missa-card {
-  padding: 1rem;
+  padding: 0.9rem 1rem 1rem;
   border-radius: var(--em-radius);
-  background: var(--em-bg);
-  border: 1px solid var(--em-border);
+  background: var(--em-surface-2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .missa-card__top {
-  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.8rem;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--em-border);
 }
 
-.missa-card__horario {
-  margin: 0;
-  font-size: 1.0625rem;
-  font-weight: 700;
-  color: var(--em-text);
+.missa-card__badge {
+  flex-shrink: 0;
+  min-width: 3.1rem;
+  padding: 0.5rem 0.45rem;
+  border-radius: 10px;
+  background: rgba(107, 163, 224, 0.14);
+  border: 1px solid rgba(107, 163, 224, 0.28);
+  font-size: 0.875rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  color: var(--em-accent-soft);
 }
 
-.missa-card__padre {
-  margin: 0.25rem 0 0;
-  font-size: 0.9375rem;
-  color: var(--em-text-soft);
+.missa-card__celebrante {
+  margin: 0;
+  min-width: 0;
+  flex: 1;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--em-label);
+}
+
+.missa-card__celebrante--nome {
+  color: var(--em-accent-soft);
+}
+
+.day-card--domingo .missa-card__celebrante--nome {
+  color: var(--em-gold);
+}
+
+.day-card--domingo .missa-card__badge {
+  background: rgba(232, 196, 104, 0.14);
+  border-color: rgba(232, 196, 104, 0.32);
+  color: var(--em-gold);
 }
 
 .missa-card__bloco {
@@ -956,9 +984,28 @@
   opacity: 0.65;
 }
 
-.extra-servico__tipo {
-  display: inline-block;
+.extra-servico__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
   margin-bottom: 0.35rem;
+}
+
+.extra-servico__horario {
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--em-text-soft);
+}
+
+.extra-servico__horario--vazio {
+  flex: 1;
+}
+
+.extra-servico__tipo {
+  flex-shrink: 0;
+  margin-bottom: 0;
   padding: 0.12rem 0.45rem;
   border-radius: 999px;
   font-size: 0.625rem;
@@ -1012,7 +1059,11 @@
   color: var(--em-text);
 }
 
-.extra-servico__meta {
+.extra-servico__top + .extra-servico__evento {
+  margin-top: 0.1rem;
+}
+
+.extra-servico__local {
   margin: 0.2rem 0 0;
   font-size: 0.8125rem;
   color: var(--em-text-soft);

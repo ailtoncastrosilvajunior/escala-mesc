@@ -8,18 +8,30 @@ interface Props {
 
 export function MissaCard({ missa }: Props) {
   const mostrarAdoracao = isDiaUtil(missa.diaSemana) && missa.adoracao.trim()
+  const horario = horarioLabel(missa.horario)
+  const celebrante = missa.celebrante.trim()
+  const titulo = celebrante || 'Missa'
 
   return (
-    <article className="missa-card">
+    <article
+      className="missa-card"
+      aria-label={`Missa das ${horario}${celebrante ? `, ${celebrante}` : ''}`}
+    >
       <header className="missa-card__top">
-        <h3 className="missa-card__horario">Missa das {horarioLabel(missa.horario)}</h3>
-        {missa.celebrante && (
-          <p className="missa-card__padre">{missa.celebrante}</p>
-        )}
+        <span className="missa-card__badge" aria-hidden="true">
+          {horario}
+        </span>
+        <h3
+          className={`missa-card__celebrante${
+            celebrante ? ' missa-card__celebrante--nome' : ''
+          }`}
+        >
+          {titulo}
+        </h3>
       </header>
 
       <div className="missa-card__bloco missa-card__bloco--mesc">
-        <span className="missa-card__rotulo">Comunhão (MESC)</span>
+        <span className="missa-card__rotulo">COMUNHÃO (MESC)</span>
         <p className="missa-card__valor">{missa.mesc}</p>
       </div>
 

@@ -8,6 +8,34 @@ function stripAccents(value: string): string {
   return value.normalize('NFD').replace(/\p{M}/gu, '')
 }
 
+function normalizeText(value: string): string {
+  return stripAccents(value.trim().toLowerCase())
+}
+
+/** Título do evento sem repetir o que já está no badge de tipo. */
+export function servicoEventoTitulo(evento: string, tipo: string): string | null {
+  const eventoTrim = evento.trim()
+  if (!eventoTrim) return null
+
+  const tipoTrim = tipo.trim()
+  if (!tipoTrim) return eventoTrim
+
+  const eventoNorm = normalizeText(eventoTrim)
+  const tipoNorm = normalizeText(tipoTrim)
+
+  if (eventoNorm === tipoNorm) return null
+
+  if (eventoNorm.startsWith(tipoNorm)) {
+    const rest = eventoTrim
+      .slice(tipoTrim.length)
+      .trim()
+      .replace(/^[·\-–—:\s]+/, '')
+    return rest || null
+  }
+
+  return eventoTrim
+}
+
 export function normalizeServicoTipo(tipo: string): ServicoTipoKey {
   const normalized = stripAccents(tipo.trim().toLowerCase())
   if (!normalized) return 'outro'

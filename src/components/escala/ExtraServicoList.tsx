@@ -1,6 +1,6 @@
 import type { ServicoExtra } from '../../types'
 import { isSemEventoExtra } from '../../lib/parseEscalaExtra'
-import { servicoTipoBorderClass, servicoTipoClassName } from '../../lib/servicoExtraTipo'
+import { servicoEventoTitulo, servicoTipoBorderClass, servicoTipoClassName } from '../../lib/servicoExtraTipo'
 
 interface Props {
   servicos: ServicoExtra[]
@@ -12,12 +12,6 @@ function telefoneHref(telefone: string): string | null {
   const digits = trimmed.replace(/\D/g, '')
   if (digits.length < 8) return null
   return `tel:+55${digits}`
-}
-
-function ServicoMeta({ servico }: { servico: ServicoExtra }) {
-  const parts = [servico.horario, servico.local].filter(Boolean)
-  if (parts.length === 0) return null
-  return <p className="extra-servico__meta">{parts.join(' · ')}</p>
 }
 
 function ServicoResponsavel({ servico }: { servico: ServicoExtra }) {
@@ -52,11 +46,16 @@ export function ExtraServicoList({ servicos }: Props) {
     <ul className="extra-servico-list">
       {servicos.map((servico, index) => {
         const vazio = isSemEventoExtra(servico.evento)
+        const eventoTitulo = vazio
+          ? servico.evento
+          : servicoEventoTitulo(servico.evento, servico.tipo)
         const key = `${servico.evento}-${servico.horario}-${index}`
 
         const tipoBorder = servico.tipo && !vazio
           ? servicoTipoBorderClass(servico.tipo)
           : ''
+
+        const mostrarTopo = !vazio && (servico.horario || servico.tipo)
 
         return (
           <li
@@ -65,17 +64,32 @@ export function ExtraServicoList({ servicos }: Props) {
               tipoBorder ? ` ${tipoBorder}` : ''
             }`}
           >
-            {!vazio && servico.tipo && (
-              <span
-                className={`extra-servico__tipo ${servicoTipoClassName(servico.tipo)}`}
-              >
-                {servico.tipo}
-              </span>
+            {mostrarTopo && (
+              <div className="extra-servico__top">
+                {servico.horario ? (
+                  <span className="extra-servico__horario">{servico.horario}</span>
+                ) : (
+                  <span className="extra-servico__horario extra-servico__horario--vazio" />
+                )}
+                {servico.tipo && (
+                  <span
+                    className={`extra-servico__tipo ${servicoTipoClassName(servico.tipo)}`}
+                  >
+                    {servico.tipo}
+                  </span>
+                )}
+              </div>
             )}
-            <p className="extra-servico__evento">{servico.evento}</p>
+
+            {eventoTitulo && (
+              <p className="extra-servico__evento">{eventoTitulo}</p>
+            )}
+
             {!vazio && (
               <>
-                <ServicoMeta servico={servico} />
+                {servico.local && (
+                  <p className="extra-servico__local">{servico.local}</p>
+                )}
                 <ServicoResponsavel servico={servico} />
                 {servico.observacao && (
                   <p className="extra-servico__obs">{servico.observacao}</p>
