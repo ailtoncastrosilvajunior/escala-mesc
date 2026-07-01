@@ -42,13 +42,35 @@ export function ConfigPanel({ config, configSource, onChange, onSave, saved }: P
 
       <div className="field-row">
         <div className="field">
-          <label htmlFor="sheetName">Nome da aba</label>
+          <label htmlFor="sheetName">Aba escala padrão</label>
           <input
             id="sheetName"
             type="text"
             placeholder="Escala"
             value={config.sheetName}
             onChange={(e) => update('sheetName', e.target.value)}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="extraSheetName">Aba escala extra</label>
+          <input
+            id="extraSheetName"
+            type="text"
+            placeholder="Escala Extra"
+            value={config.extraSheetName ?? ''}
+            onChange={(e) => update('extraSheetName', e.target.value || undefined)}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="extraServicosSheetName">Aba serviços extra</label>
+          <input
+            id="extraServicosSheetName"
+            type="text"
+            placeholder="Serviços Extra"
+            value={config.extraServicosSheetName ?? ''}
+            onChange={(e) =>
+              update('extraServicosSheetName', e.target.value || undefined)
+            }
           />
         </div>
         <div className="field">

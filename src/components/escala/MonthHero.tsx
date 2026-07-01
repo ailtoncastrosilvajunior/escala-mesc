@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react'
 import type { EscalaMes } from '../../types'
 import {
+  getCurrentMesKey,
   getMesNome,
   mesKeyFromEscala,
   ultimosMesesParaCards,
@@ -41,6 +42,8 @@ export function MonthHero({
     () => ultimosMesesParaCards(opcoes, selectedKey, 3),
     [opcoes, selectedKey],
   )
+
+  const currentMesKey = getCurrentMesKey()
 
   const handleMetaClick = () => {
     if (!onAdminUnlock) return
@@ -103,6 +106,7 @@ export function MonthHero({
           {cards.map((item) => {
             const key = mesKeyFromEscala(item)
             const active = selectedKey === key
+            const current = key === currentMesKey
             const released = isMesReleased?.(item) ?? true
             const rascunho = !released && adminMode
 
@@ -113,6 +117,7 @@ export function MonthHero({
                 className={[
                   'month-card',
                   active ? 'month-card--active' : '',
+                  current ? 'month-card--current' : '',
                   rascunho ? 'month-card--draft' : '',
                 ]
                   .filter(Boolean)

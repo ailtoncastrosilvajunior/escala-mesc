@@ -9,7 +9,9 @@ import {
 } from './lib/adminMode'
 import {
   filterReleasedEscalas,
+  filterReleasedPlantoes,
   isEscalaReleased,
+  isMonthReleased,
 } from './lib/escalaRelease'
 import {
   mesKeyFromEscala,
@@ -31,11 +33,14 @@ import {
 } from './lib/loadConfig'
 import { inferPeriodo, parseEscala } from './lib/parseEscala'
 import { isMescSheetFormat, parseEscalaMescAll } from './lib/parseEscalaMesc'
+import { parsePlantaoExtraAll } from './lib/parseEscalaExtra'
+import { AppBottomNav } from './components/AppBottomNav'
 import { ConfiguracaoPage } from './pages/ConfiguracaoPage'
 import { DemonstrativoPage } from './pages/DemonstrativoPage'
 import { EscalaMesPage } from './pages/EscalaMesPage'
 import { PlanilhaPage } from './pages/PlanilhaPage'
-import type { AppView, EscalaMes, ParsedEscala, SheetConfig } from './types'
+import { PlantaoExtraPage } from './pages/PlantaoExtraPage'
+import type { AppView, EscalaMes, ParsedEscala, PlantaoExtraMes, SheetConfig } from './types'
 import './App.css'
 
 function App() {
@@ -45,6 +50,9 @@ function App() {
   const [escala, setEscala] = useState<ParsedEscala | null>(null)
   const [escalaMes, setEscalaMes] = useState<EscalaMes | null>(null)
   const [escalasMes, setEscalasMes] = useState<EscalaMes[]>([])
+  const [plantoesMes, setPlantoesMes] = useState<PlantaoExtraMes[]>([])
+  const [plantaoMes, setPlantaoMes] = useState<PlantaoExtraMes | null>(null)
+  const [plantaoError, setPlantaoError] = useState<string | null>(null)
   const [mesAtivoKey, setMesAtivoKey] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [booting, setBooting] = useState(true)
@@ -79,6 +87,9 @@ function App() {
       setEscala(null)
       setEscalaMes(null)
       setEscalasMes([])
+      setPlantoesMes([])
+      setPlantaoMes(null)
+      setPlantaoError(null)
       setMesAtivoKey(null)
       return
     }
@@ -124,10 +135,48 @@ function App() {
         return { ...prev, periodo }
       })
       setEscala(parsed)
+
+      const extraName = currentConfig.extraSheetName?.trim()
+      if (extraName) {
+        try {
+          const { rows: extraRows } = await fetchSheetRows(
+            currentConfig.spreadsheetId,
+            extraName,
+          )
+          let servicoRows: string[][] | undefined
+          const servicosName = currentConfig.extraServicosSheetName?.trim()
+          if (servicosName) {
+            try {
+              const fetched = await fetchSheetRows(
+                currentConfig.spreadsheetId,
+                servicosName,
+              )
+              servicoRows = fetched.rows
+            } catch {
+              servicoRows = undefined
+            }
+          }
+          setPlantoesMes(parsePlantaoExtraAll(extraRows, servicoRows))
+          setPlantaoError(null)
+        } catch (err) {
+          setPlantoesMes([])
+          setPlantaoError(
+            err instanceof Error
+              ? err.message
+              : 'Erro ao carregar aba de escala extra.',
+          )
+        }
+      } else {
+        setPlantoesMes([])
+        setPlantaoError(null)
+      }
     } catch (err) {
       setEscala(null)
       setEscalaMes(null)
       setEscalasMes([])
+      setPlantoesMes([])
+      setPlantaoMes(null)
+      setPlantaoError(null)
       setMesAtivoKey(null)
       setError(err instanceof Error ? err.message : 'Erro ao carregar planilha.')
     } finally {
@@ -168,17 +217,27 @@ function App() {
     [escalasMes, adminMode, releaseLimit],
   )
 
+  const plantoesParaPicker = useMemo(
+    () =>
+      adminMode
+        ? plantoesMes
+        : filterReleasedPlantoes(plantoesMes, false, releaseLimit),
+    [plantoesMes, adminMode, releaseLimit],
+  )
+
   const handleSelectMes = useCallback(
     (key: string) => {
-      const item = escalasMes.find((e) => mesKeyFromEscala(e) === key)
-      if (!item) return
-      if (!isEscalaReleased(item, adminMode, releaseLimit)) return
+      const escalaItem = escalasMes.find((e) => mesKeyFromEscala(e) === key)
+      const plantaoItem = plantoesMes.find((p) => mesKeyFromEscala(p) === key)
+      if (!escalaItem && !plantaoItem) return
+
+      const ref = escalaItem ?? plantaoItem!
+      if (!isMonthReleased(ref.ano, ref.mes, adminMode, releaseLimit)) return
 
       saveMesKey(key)
       setMesAtivoKey(key)
-      setEscalaMes(item)
     },
-    [escalasMes, adminMode, releaseLimit],
+    [escalasMes, plantoesMes, adminMode, releaseLimit],
   )
 
   useEffect(() => {
@@ -219,6 +278,31 @@ function App() {
     )
   }, [mesAtivoKey, escalasMes, adminMode, releaseLimit])
 
+  useEffect(() => {
+    if (!mesAtivoKey) {
+      setPlantaoMes(null)
+      return
+    }
+    const item =
+      plantoesMes.find((p) => mesKeyFromEscala(p) === mesAtivoKey) ?? null
+    setPlantaoMes(
+      item && isEscalaReleased(
+        {
+          mesAno: item.mesAno,
+          mes: item.mes,
+          ano: item.ano,
+          dias: [],
+          horarios: [],
+          totalMissas: 0,
+        },
+        adminMode,
+        releaseLimit,
+      )
+        ? item
+        : null,
+    )
+  }, [mesAtivoKey, plantoesMes, adminMode, releaseLimit])
+
   const html = useMemo(() => {
     if (!config || !escala || escala.porData.length === 0) return null
     return generateDemonstrativoHtml(config, escala.porData)
@@ -253,22 +337,24 @@ function App() {
     if (html) downloadHtml(html)
   }
 
-  const isEscalaView = view === 'escala-mes'
-  const showHeader = !isEscalaView || adminMode
-
   if (booting || !config) {
     return (
-      <div className={`app${isEscalaView ? ' app--escala' : ''} app-loading`}>
+      <div className="app app-loading">
         <p>Carregando configuração…</p>
       </div>
     )
   }
 
+  const isMobileView = view === 'escala-mes' || view === 'plantao-extra'
+  const showBottomNav =
+    Boolean(config.extraSheetName?.trim()) && isMobileView
+  const showHeader = !isMobileView || adminMode
+
   return (
-    <div className={`app${isEscalaView ? ' app--escala' : ''}`}>
+    <div className={`app${isMobileView ? ' app--escala' : ''}`}>
       {showHeader && (
-        <header className={`app-header${isEscalaView ? ' app-header--minimal' : ''}`}>
-          {!isEscalaView && (
+        <header className={`app-header${isMobileView ? ' app-header--minimal' : ''}`}>
+          {!isMobileView && (
             <div>
               <p className="eyebrow">Escala MESC</p>
               <h1>Demonstrativo de escala</h1>
@@ -288,7 +374,7 @@ function App() {
         </div>
       )}
 
-      <main className={`main-content${isEscalaView ? ' main-content--full' : ''}`}>
+      <main className={`main-content${isMobileView ? ' main-content--full' : ''}`}>
         {view === 'escala-mes' && (
           <EscalaMesPage
             escala={escalaMes}
@@ -302,6 +388,23 @@ function App() {
             loading={loading}
             onReload={handleReload}
             onAdminUnlock={handleAdminUnlock}
+          />
+        )}
+
+        {view === 'plantao-extra' && (
+          <PlantaoExtraPage
+            plantao={plantaoMes}
+            meses={plantoesParaPicker}
+            totalMesesNaPlanilha={plantoesMes.length}
+            mesAtivoKey={mesAtivoKey}
+            onSelectMes={handleSelectMes}
+            isMesReleased={(item) => isEscalaReleased(item, false, releaseLimit)}
+            escalaLiberadaAte={releaseLimit}
+            adminMode={adminMode}
+            loading={loading}
+            onReload={handleReload}
+            onAdminUnlock={handleAdminUnlock}
+            loadError={plantaoError}
           />
         )}
 
@@ -337,6 +440,10 @@ function App() {
           />
         )}
       </main>
+
+      {showBottomNav && (
+        <AppBottomNav active={view} onChange={setView} />
+      )}
     </div>
   )
 }

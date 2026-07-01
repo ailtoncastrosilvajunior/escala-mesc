@@ -128,6 +128,26 @@
   opacity: 0.85;
 }
 
+.month-card--current:not(.month-card--active) {
+  border-color: var(--em-gold);
+  background: rgba(232, 196, 104, 0.1);
+}
+
+.month-card--current:not(.month-card--active) .month-card__mes {
+  color: var(--em-gold);
+}
+
+.month-card--current:not(.month-card--active) .month-card__ano {
+  color: var(--em-gold);
+  opacity: 0.85;
+}
+
+.month-card--active.month-card--current {
+  box-shadow:
+    inset 0 0 0 1px rgba(107, 163, 224, 0.2),
+    inset 0 0 0 2px rgba(232, 196, 104, 0.35);
+}
+
 .month-card--draft {
   border-style: dashed;
 }
@@ -736,4 +756,296 @@
     border-color: var(--em-accent);
     color: var(--em-text);
   }
+}
+
+/* Escala extra */
+.plantao-hoje {
+  margin: 0.75rem 0;
+  padding: 1rem;
+  border: 1.5px solid rgba(232, 196, 104, 0.45);
+  border-radius: var(--em-radius);
+  background: rgba(232, 196, 104, 0.1);
+}
+
+.plantao-hoje__label {
+  margin: 0 0 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--em-gold);
+}
+
+.plantao-hoje__titulo {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--em-text);
+}
+
+.plantao-hoje__nomes {
+  margin: 0.5rem 0 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--em-gold);
+}
+
+.plantao-hoje__ate {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--em-text-soft);
+}
+
+.plantao-lista-wrap {
+  padding: 0.75rem 0 0;
+}
+
+.plantao-lista {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.extra-periodo {
+  padding: 0.85rem 0.9rem 0.75rem;
+  border: 1.5px solid var(--em-border);
+  border-radius: var(--em-radius);
+  background: var(--em-surface);
+}
+
+.extra-periodo--hoje {
+  border-color: rgba(232, 196, 104, 0.45);
+  background: rgba(232, 196, 104, 0.08);
+}
+
+.extra-periodo__corpo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+}
+
+.extra-periodo__dias {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.extra-periodo__dia-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.extra-periodo__sep {
+  margin: 0 0.35rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--em-label);
+}
+
+.extra-dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 10px;
+  background: var(--em-surface-2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.extra-dia--hoje {
+  border-color: rgba(232, 196, 104, 0.5);
+  background: rgba(232, 196, 104, 0.15);
+}
+
+.extra-dia__num {
+  font-size: 1.375rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--em-text);
+}
+
+.extra-dia--hoje .extra-dia__num {
+  color: var(--em-gold);
+}
+
+.extra-dia__semana {
+  margin-top: 0.2rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--em-label);
+}
+
+.extra-dia--hoje .extra-dia__semana {
+  color: var(--em-gold);
+  opacity: 0.9;
+}
+
+.extra-periodo__nomes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+  text-align: right;
+}
+
+.extra-periodo__nome {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--em-accent-soft);
+}
+
+.extra-periodo--hoje .extra-periodo__nome {
+  color: var(--em-gold);
+}
+
+.extra-periodo__servicos {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--em-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.extra-dia-servicos__titulo {
+  margin: 0 0 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--em-label);
+}
+
+.extra-servico-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.extra-servico {
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  background: var(--em-surface-2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.extra-periodo--hoje .extra-servico {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.extra-servico--vazio {
+  background: transparent;
+  border-style: dashed;
+  opacity: 0.65;
+}
+
+.extra-servico__tipo {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+.extra-servico__tipo--adoracao {
+  background: rgba(239, 68, 68, 0.22);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.extra-servico__tipo--casamento {
+  background: rgba(96, 165, 250, 0.2);
+  color: #93c5fd;
+  border: 1px solid rgba(96, 165, 250, 0.35);
+}
+
+.extra-servico__tipo--missa-7-dia {
+  background: rgba(250, 204, 21, 0.18);
+  color: #fde047;
+  border: 1px solid rgba(250, 204, 21, 0.35);
+}
+
+.extra-servico__tipo--outro {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--em-text-soft);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.extra-servico--tipo-adoracao {
+  border-left: 3px solid rgba(239, 68, 68, 0.55);
+}
+
+.extra-servico--tipo-casamento {
+  border-left: 3px solid rgba(96, 165, 250, 0.55);
+}
+
+.extra-servico--tipo-missa-7-dia {
+  border-left: 3px solid rgba(250, 204, 21, 0.55);
+}
+
+.extra-servico__evento {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--em-text);
+}
+
+.extra-servico__meta {
+  margin: 0.2rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--em-text-soft);
+}
+
+.extra-servico__resp {
+  margin: 0.25rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--em-accent-soft);
+}
+
+.extra-servico__resp-nome {
+  font-weight: 600;
+}
+
+.extra-servico__tel {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.extra-servico__tel:hover {
+  text-decoration: underline;
+}
+
+.extra-servico__obs {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: var(--em-label);
+  font-style: italic;
+}
+
+.plantao-hoje__servicos {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(232, 196, 104, 0.25);
 }

@@ -11,6 +11,10 @@ export interface ColumnNames {
 export interface SheetConfig {
   spreadsheetId: string
   sheetName: string
+  /** Nome da aba de escala extra (plantão). Vazio = aba desativada. */
+  extraSheetName?: string
+  /** Nome da aba de serviços extra. Vazio = aba desativada. */
+  extraServicosSheetName?: string
   titulo: string
   subtitulo: string
   periodo: string
@@ -103,13 +107,56 @@ export const DEFAULT_COLUMN_MAPPING: ColumnMapping = {
 export const DEFAULT_SHEET_CONFIG: SheetConfig = {
   spreadsheetId: '',
   sheetName: 'Escala',
+  extraSheetName: 'Escala Extra',
+  extraServicosSheetName: 'Serviços Extra',
   titulo: 'Demonstrativo · Escala MESC',
   subtitulo: 'Ministério de Escalas · Comunidade',
   periodo: '',
   coordenacao: '',
 }
 
-export type AppView = 'escala-mes' | 'demonstrativo' | 'planilha' | 'configuracao'
+export type AppView =
+  | 'escala-mes'
+  | 'plantao-extra'
+  | 'demonstrativo'
+  | 'planilha'
+  | 'configuracao'
+
+export interface ServicoExtra {
+  tipo: string
+  evento: string
+  horario: string
+  local: string
+  responsavel: string
+  telefone: string
+  observacao: string
+}
+
+export interface PlantaoDia {
+  dataISO: string
+  dataLabel: string
+  diaSemana: string
+  diaNumero: number
+  ministros: string[]
+  servicos: ServicoExtra[]
+}
+
+export interface PlantaoPeriodo {
+  inicioISO: string
+  fimISO: string
+  labelInicio: string
+  labelFim: string
+  dias: PlantaoDia[]
+  ministros: string[]
+}
+
+export interface PlantaoExtraMes {
+  mesAno: string
+  mes: number
+  ano: number
+  dias: PlantaoDia[]
+  periodos: PlantaoPeriodo[]
+}
 
 export interface MissaEvent {
   id: string

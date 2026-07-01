@@ -42,6 +42,16 @@ export function filterReleasedEscalas(
   return escalas.filter((e) => isEscalaReleased(e, adminMode, escalaLiberadaAte))
 }
 
+export function filterReleasedPlantoes<T extends { ano: number; mes: number }>(
+  items: T[],
+  adminMode: boolean,
+  escalaLiberadaAte?: string,
+): T[] {
+  return items.filter((item) =>
+    isMonthReleased(item.ano, item.mes, adminMode, escalaLiberadaAte),
+  )
+}
+
 export function getReleaseHint(escalaLiberadaAte?: string): string | null {
   const limit = getReleasedUntil(escalaLiberadaAte)
   if (!limit) return null

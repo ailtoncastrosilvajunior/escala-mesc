@@ -14,7 +14,7 @@ export function mesKey(ano: number, mes: number): string {
   return `${ano}-${String(mes).padStart(2, '0')}`
 }
 
-export function mesKeyFromEscala(escala: EscalaMes): string {
+export function mesKeyFromEscala(escala: MesRef): string {
   return mesKey(escala.ano, escala.mes)
 }
 
@@ -43,6 +43,11 @@ export function formatMesCurto(ano: number, mes: number): string {
 
 export function getMesNome(mes: number): string {
   return MESES[mes - 1] ?? ''
+}
+
+export function getCurrentMesKey(): string {
+  const now = new Date()
+  return mesKey(now.getFullYear(), now.getMonth() + 1)
 }
 
 /** Até `max` meses para os cards: os mais recentes, garantindo o selecionado visível. */
@@ -86,8 +91,7 @@ export function pickDefaultMesKey(
     return savedKey
   }
 
-  const now = new Date()
-  const current = mesKey(now.getFullYear(), now.getMonth() + 1)
+  const current = getCurrentMesKey()
   if (opcoes.some((e) => mesKeyFromEscala(e) === current)) {
     return current
   }

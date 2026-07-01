@@ -16,15 +16,23 @@ function envOverrides(): Partial<SheetConfig> {
   const overrides: Partial<SheetConfig> = {}
 
   const spreadsheetId = envValue('VITE_SPREADSHEET_ID')
-  const sheetName = envValue('VITE_SHEET_NAME')
+  const padraoSheetName =
+    envValue('VITE_PADRAO_SHEET_NAME') ?? envValue('VITE_SHEET_NAME')
   const titulo = envValue('VITE_TITULO')
   const subtitulo = envValue('VITE_SUBTITULO')
   const periodo = envValue('VITE_PERIODO')
   const coordenacao = envValue('VITE_COORDENACAO')
   const escalaLiberadaAte = envValue('VITE_ESCALA_LIBERADA_ATE')
 
+  const extraSheetName = envValue('VITE_EXTRA_SHEET_NAME')
+  const extraServicosSheetName = envValue('VITE_EXTRA_SERVICOS_SHEET_NAME')
+
   if (spreadsheetId) overrides.spreadsheetId = spreadsheetId
-  if (sheetName) overrides.sheetName = sheetName
+  if (padraoSheetName) overrides.sheetName = padraoSheetName
+  if (extraSheetName !== undefined) overrides.extraSheetName = extraSheetName
+  if (extraServicosSheetName !== undefined) {
+    overrides.extraServicosSheetName = extraServicosSheetName
+  }
   if (titulo) overrides.titulo = titulo
   if (subtitulo) overrides.subtitulo = subtitulo
   if (periodo) overrides.periodo = periodo
@@ -57,6 +65,10 @@ function normalizeConfig(raw: Partial<SheetConfig>): SheetConfig {
     ...raw,
     spreadsheetId,
     sheetName: raw.sheetName?.trim() || DEFAULT_SHEET_CONFIG.sheetName,
+    extraSheetName: raw.extraSheetName?.trim() || DEFAULT_SHEET_CONFIG.extraSheetName,
+    extraServicosSheetName:
+      raw.extraServicosSheetName?.trim() ||
+      DEFAULT_SHEET_CONFIG.extraServicosSheetName,
     headerRow,
     columns: columns && Object.keys(columns).length > 0 ? columns : undefined,
     escalaLiberadaAte,

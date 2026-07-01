@@ -247,10 +247,6 @@ export function EscalaMesPage({
           </div>
         )}
       </section>
-
-      <footer className="escala-footer">
-        <p>Face de Cristo · MESC · {escala.mesAno}</p>
-      </footer>
     </div>
   )
 }
