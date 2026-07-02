@@ -1,12 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { EscalaMes, PlantaoExtraMes } from '../types'
-import { getTodayISO } from '../lib/calendarUtils'
+import { getTodayISO, initialSelectedDate } from '../lib/calendarUtils'
 import { getReleaseHint } from '../lib/escalaRelease'
 import { formatDiaTitulo } from '../lib/diaUtils'
 import {
   filterPlantaoExtraMes,
   findPlantaoPeriodoHoje,
 } from '../lib/parseEscalaExtra'
+import { tiposUnicosDoDia } from '../lib/servicoExtraTipo'
+import { ExtraMonthCalendar } from '../components/escala/ExtraMonthCalendar'
 import { ExtraPeriodoItem } from '../components/escala/ExtraPeriodoItem'
 import { ExtraServicoList } from '../components/escala/ExtraServicoList'
 import { EscalaFilters } from '../components/escala/EscalaFilters'
@@ -43,7 +45,9 @@ export function PlantaoExtraPage({
   loadError,
 }: Props) {
   const [search, setSearch] = useState('')
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const todayISO = getTodayISO()
+  const plantaoKey = plantao ? `${plantao.ano}-${plantao.mes}` : null
   const releaseHint = getReleaseHint(escalaLiberadaAte)
   const mesRascunho = plantao && adminMode && !isMesReleased({
     mesAno: plantao.mesAno,
@@ -54,10 +58,46 @@ export function PlantaoExtraPage({
     totalMissas: 0,
   })
 
-  const filtered = useMemo(() => {
+  useEffect(() => {
+    if (!plantao) {
+      setSelectedDate(null)
+      return
+    }
+    setSelectedDate(initialSelectedDate(plantao))
+    setSearch('')
+  }, [plantaoKey, plantao])
+
+  const forCalendar = useMemo(() => {
     if (!plantao) return null
     return filterPlantaoExtraMes(plantao, search)
   }, [plantao, search])
+
+  const diasComPlantao = useMemo(() => {
+    if (!forCalendar) return []
+    return forCalendar.dias.map((d) => d.dataISO)
+  }, [forCalendar])
+
+  const tiposPorDia = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof tiposUnicosDoDia>>()
+    if (!forCalendar) return map
+    for (const dia of forCalendar.dias) {
+      const tipos = tiposUnicosDoDia(dia.servicos)
+      if (tipos.length > 0) {
+        map.set(dia.dataISO, tipos)
+      }
+    }
+    return map
+  }, [forCalendar])
+
+  const filtered = useMemo(() => {
+    if (!plantao) return null
+    return filterPlantaoExtraMes(plantao, search, selectedDate)
+  }, [plantao, search, selectedDate])
+
+  const diaSelecionado = useMemo(() => {
+    if (!plantao || !selectedDate) return null
+    return plantao.dias.find((d) => d.dataISO === selectedDate) ?? null
+  }, [plantao, selectedDate])
 
   const periodoHoje = useMemo(() => {
     if (!plantao) return null
@@ -177,8 +217,30 @@ export function PlantaoExtraPage({
         />
       </div>
 
+      <section className="escala-calendario-wrap" aria-label="Navegação por dia">
+        <ExtraMonthCalendar
+          ano={plantao.ano}
+          mes={plantao.mes}
+          diasComPlantao={diasComPlantao}
+          tiposPorDia={tiposPorDia}
+          selected={selectedDate}
+          onSelect={setSelectedDate}
+          filtroAtivo={Boolean(search.trim())}
+        />
+      </section>
+
       <section className="plantao-lista-wrap" aria-label="Extra do mês">
-        <h2 className="escala-resultado__titulo">Extra do mês</h2>
+        <h2 className="escala-resultado__titulo">
+          {diaSelecionado
+            ? formatDiaTitulo(
+                diaSelecionado.diaSemana,
+                diaSelecionado.diaNumero,
+                plantao.mes,
+              )
+            : selectedDate
+              ? 'Extra do dia'
+              : 'Extra do mês'}
+        </h2>
 
         {filtered && filtered.periodos.length > 0 ? (
           <ul className="plantao-lista">
@@ -199,7 +261,10 @@ export function PlantaoExtraPage({
               <button
                 type="button"
                 className="btn-escala btn-escala--ghost"
-                onClick={() => setSearch('')}
+                onClick={() => {
+                  setSearch('')
+                  setSelectedDate(initialSelectedDate(plantao))
+                }}
               >
                 Limpar busca
               </button>

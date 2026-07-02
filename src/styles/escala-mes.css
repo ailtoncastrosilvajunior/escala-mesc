@@ -512,6 +512,86 @@
   opacity: 0.35;
 }
 
+/* Calendário da escala extra — bolinhas por tipo de evento */
+.month-calendar--extra .month-calendar__day--has-escala::after {
+  display: none;
+}
+
+.month-calendar--extra .month-calendar__day--has-escala:not(.month-calendar__day--has-eventos) {
+  padding-bottom: 0;
+}
+
+.month-calendar__dica-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.month-calendar__marcador--tipo {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 0;
+  margin-left: 0.35rem;
+}
+
+.month-calendar__dica-filtro {
+  margin: 0 0 0.35rem;
+  font-size: 0.6875rem;
+  color: var(--em-label);
+}
+
+.extra-cal-dots {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transform: translateX(-50%);
+  max-width: calc(100% - 4px);
+}
+
+.extra-cal-dot {
+  flex-shrink: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.extra-cal-dot--adoracao {
+  background: #ef4444;
+}
+
+.extra-cal-dot--casamento {
+  background: #60a5fa;
+}
+
+.extra-cal-dot--missa-7-dia {
+  background: #facc15;
+}
+
+.extra-cal-dot--outro {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.month-calendar__day--selected .extra-cal-dot--adoracao {
+  background: #fca5a5;
+}
+
+.month-calendar__day--selected .extra-cal-dot--casamento {
+  background: #93c5fd;
+}
+
+.month-calendar__day--selected .extra-cal-dot--missa-7-dia {
+  background: #fde047;
+}
+
+.month-calendar__day--selected .extra-cal-dot--outro {
+  background: rgba(255, 255, 255, 0.65);
+}
+
 .month-calendar__ver-mes {
   display: inline-flex;
   align-items: center;

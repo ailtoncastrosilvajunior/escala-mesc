@@ -1,8 +1,24 @@
+import type { ServicoExtra } from '../types'
+
 export type ServicoTipoKey =
   | 'adoracao'
   | 'casamento'
   | 'missa-7-dia'
   | 'outro'
+
+export const SERVICO_TIPO_ORDER: ServicoTipoKey[] = [
+  'adoracao',
+  'casamento',
+  'missa-7-dia',
+  'outro',
+]
+
+export const SERVICO_TIPOS_LEGEND: { key: ServicoTipoKey; label: string }[] = [
+  { key: 'adoracao', label: 'Adoração' },
+  { key: 'casamento', label: 'Casamento' },
+  { key: 'missa-7-dia', label: 'Missa 7º dia' },
+  { key: 'outro', label: 'Outro' },
+]
 
 function stripAccents(value: string): string {
   return value.normalize('NFD').replace(/\p{M}/gu, '')
@@ -52,4 +68,16 @@ export function servicoTipoClassName(tipo: string): string {
 export function servicoTipoBorderClass(tipo: string): string {
   const key = normalizeServicoTipo(tipo)
   return key === 'outro' ? '' : `extra-servico--tipo-${key}`
+}
+
+export function servicoTipoDotClass(key: ServicoTipoKey): string {
+  return `extra-cal-dot--${key}`
+}
+
+export function tiposUnicosDoDia(servicos: ServicoExtra[]): ServicoTipoKey[] {
+  const set = new Set<ServicoTipoKey>()
+  for (const servico of servicos) {
+    set.add(normalizeServicoTipo(servico.tipo))
+  }
+  return SERVICO_TIPO_ORDER.filter((key) => set.has(key))
 }

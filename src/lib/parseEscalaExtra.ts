@@ -291,11 +291,14 @@ export function parsePlantaoExtraAll(
 export function filterPlantaoExtraMes(
   plantao: PlantaoExtraMes,
   search: string,
+  dateFilter: string | null = null,
 ): PlantaoExtraMes {
   const term = search.trim().toLowerCase()
-  if (!term) return plantao
 
-  const periodos = plantao.periodos.filter((periodo) => {
+  let periodos = plantao.periodos
+
+  if (term) {
+    periodos = periodos.filter((periodo) => {
     const blob = [
       ...periodo.ministros,
       ...periodo.dias.map((d) => d.diaSemana),
@@ -313,7 +316,17 @@ export function filterPlantaoExtraMes(
       .join(' ')
       .toLowerCase()
     return blob.includes(term)
-  })
+    })
+  }
+
+  if (dateFilter) {
+    periodos = periodos
+      .filter((periodo) => periodo.dias.some((d) => d.dataISO === dateFilter))
+      .map((periodo) => ({
+        ...periodo,
+        dias: periodo.dias.filter((d) => d.dataISO === dateFilter),
+      }))
+  }
 
   const dias = periodos.flatMap((p) => p.dias)
 
