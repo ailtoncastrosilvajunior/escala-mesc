@@ -19,11 +19,6 @@ import {
   readSavedMesKey,
   saveMesKey,
 } from './lib/mesRef'
-import {
-  downloadHtml,
-  generateDemonstrativoHtml,
-  openHtmlPreview,
-} from './lib/generateHtml'
 import { fetchSheetRows } from './lib/googleSheets'
 import {
   downloadConfigFile,
@@ -303,11 +298,6 @@ function App() {
     )
   }, [mesAtivoKey, plantoesMes, adminMode, releaseLimit])
 
-  const html = useMemo(() => {
-    if (!config || !escala || escala.porData.length === 0) return null
-    return generateDemonstrativoHtml(config, escala.porData)
-  }, [config, escala])
-
   const handleSaveConfig = () => {
     if (!config) return
 
@@ -327,14 +317,6 @@ function App() {
 
   const handleReload = () => {
     if (config) loadEscala(config)
-  }
-
-  const handlePreview = () => {
-    if (html) openHtmlPreview(html)
-  }
-
-  const handleDownload = () => {
-    if (html) downloadHtml(html)
   }
 
   if (booting || !config) {
@@ -412,11 +394,15 @@ function App() {
           <DemonstrativoPage
             config={config}
             escala={escala}
-            html={html}
+            escalaMes={escalaMes}
+            plantaoMes={plantaoMes}
+            meses={mesesParaPicker}
+            totalMesesNaPlanilha={escalasMes.length}
+            mesAtivoKey={mesAtivoKey}
+            onSelectMes={handleSelectMes}
+            isMesReleased={(item) => isEscalaReleased(item, true, releaseLimit)}
             loading={loading}
             onReload={handleReload}
-            onPreview={handlePreview}
-            onDownload={handleDownload}
           />
         )}
 
